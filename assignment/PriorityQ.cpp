@@ -1,6 +1,18 @@
 //OM NAMO NARAYANA
+
+/*
+TIME COMPLEXITY
+1. insertion: O(n)
+2. deletion: O(logn)
+3. max: O(1)
+
+since insertion is O(n), the same problem with this time complexity can be easily implemented with array
+
+*/
+
 #include<bits/stdc++.h>
 using namespace std;
+
 
 struct node{
     int val;

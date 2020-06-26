@@ -4,7 +4,7 @@
 TIME COMPLEXITY
 1. insertion: O(logn)
 2. deletion: O(logn)
-3. max: O(logn)
+3. max: O(1)
 */
 
 #include<bits/stdc++.h>
