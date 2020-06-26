@@ -12,9 +12,9 @@ struct node{
 
 int node::size=0;
 
-void swapLeft(node *a, node *b);
-void swapRight(node *a, node *b);
-void nodeAt(node **buf);
+inline void swapLeft(node *a, node *b);
+inline void swapRight(node *a, node *b);
+void nodeAt(node **buf, node *anc, int s);
 void printHeap(node *anc);
 void printList(node *head);
 void heapifyInsert(node **anc, node *p);
@@ -46,63 +46,10 @@ void heapifyInsert(node **anc, node *p)
     {
         if(ptemp->left == p)
         {
-            // node* temp=ptemp->right;
-            // ptemp->right=p->right;
-            // p->right=temp;
-            // //p->right; ptemp->right
-            // ptemp->left=p->left;
-            // p->left=ptemp;
-            // assert(p->left != p);
-            // //ptemp->left; p->left
-            // p->parent=ptemp->parent;
-            // //p parent; ptemp->parent;
-            // if(ptemp->parent!=NULL && (ptemp->parent)->left==ptemp)
-            // {
-            //     (ptemp->parent)->left=p;
-            // }
-            // else if(ptemp->parent!=NULL)
-            // {
-            //     assert((ptemp->parent)->right=ptemp);
-            //     (ptemp->parent)->right=p;
-            // }
-            // ptemp->parent=p;
-            // //parent of ptemp
-            // if(ptemp->left != NULL)(ptemp->left)->parent=ptemp;
-            // if(ptemp->right!= NULL)(ptemp->right)->parent=ptemp;
-            // //children of p
-            // assert(ptemp->left != ptemp);
-            // assert(ptemp->right != ptemp);
-            // assert(ptemp->parent != ptemp);
-            // assert(p->left != p);
-            // assert(p->right != p);
-            // assert(p->parent != p);
             swapLeft(ptemp, p);
         }
         else
         {
-            // node* temp=ptemp->left;
-            // ptemp->left=p->left;
-            // p->left=temp;
-            // //p->left; ptemp->left
-            // ptemp->right=p->right;
-            // p->right=ptemp;
-            // //ptemp->right; p->right
-            // p->parent=ptemp->parent;
-            // //p parent; ptemp->parent;
-            // if(ptemp->parent!=NULL && (ptemp->parent)->left==ptemp)
-            // {
-            //     (ptemp->parent)->left=p;
-            // }
-            // else if(ptemp->parent!=NULL)
-            // {
-            //     assert((ptemp->parent)->right=ptemp);
-            //     (ptemp->parent)->right=p;
-            // }
-            // ptemp->parent=p;
-            // //parent of ptemp
-            // if(ptemp->left != NULL)(ptemp->left)->parent=ptemp;
-            // if(ptemp->right!= NULL)(ptemp->right)->parent=ptemp;
-            // //children of p
             swapRight(ptemp, p);
         }
         ptemp=p->parent;
@@ -124,24 +71,26 @@ void insert(node **head, node **anc, int val)
     else
     {
         node* Node=new node(val);
-        int s=node::size, h=log2(node::size);
-        int ptr=1<<h;
-        ptr=ptr>>1;
-        node *buf=*anc;
-        for(int i=0; i < h-1; i++)
-        {
-            assert(buf != NULL);
-            if(ptr&s)
-            {
-                buf=buf->right;
-            }
-            else
-            {
-                buf=buf->left;
-            }
-            ptr=ptr>>1;
-        }
-        if(ptr&s){buf->right=Node;}
+        // int s=node::size, h=log2(node::size);
+        // int ptr=1<<h;
+        // ptr=ptr>>1;
+        // node *buf=*anc;
+        // for(int i=0; i < h-1; i++)
+        // {
+        //     assert(buf != NULL);
+        //     if(ptr&s)
+        //     {
+        //         buf=buf->right;
+        //     }
+        //     else
+        //     {
+        //         buf=buf->left;
+        //     }
+        //     ptr=ptr>>1;
+        // }
+        node *buf;
+        nodeAt(&buf, *anc, (node::size)/2);
+        if(1&(node::size)){buf->right=Node;}
         else {buf->left=Node;}
         Node->parent=buf;
         node* temp=*head;
@@ -248,7 +197,7 @@ void printList(node *head)
     return;
 }
 
-void swapLeft(node *ptemp, node *p)
+inline void swapLeft(node *ptemp, node *p)
 {
     node* temp=ptemp->right;
     ptemp->right=p->right;
@@ -282,7 +231,7 @@ void swapLeft(node *ptemp, node *p)
     assert(p->parent != p);
 }
 
-void swapRight(node *ptemp, node *p)
+inline void swapRight(node *ptemp, node *p)
 {
     node* temp=ptemp->left;
     ptemp->left=p->left;
@@ -307,4 +256,26 @@ void swapRight(node *ptemp, node *p)
     if(ptemp->left != NULL)(ptemp->left)->parent=ptemp;
     if(ptemp->right!= NULL)(ptemp->right)->parent=ptemp;
     //children of p
+}
+
+void nodeAt(node **buf, node *anc, int s=node::size)
+{
+    int h=log2(s);
+    int ptr=1<<h;
+    ptr=ptr>>1;
+    *buf=anc;
+    for(int i=0; i < h; i++)
+    {
+        assert(*buf != NULL);
+        if(ptr&s)
+        {
+            *buf=(*buf)->right;
+        }
+        else
+        {
+            *buf=(*buf)->left;
+        }
+        ptr=ptr>>1;
+    }
+    return;
 }
