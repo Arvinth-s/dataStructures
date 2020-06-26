@@ -36,6 +36,9 @@ int main()
         printList(head);
         printHeap(anc);
     }
+    Pop(&head, &anc);
+    printList(head);
+    printHeap(anc);
     return 0;
 }
 
@@ -71,23 +74,6 @@ void insert(node **head, node **anc, int val)
     else
     {
         node* Node=new node(val);
-        // int s=node::size, h=log2(node::size);
-        // int ptr=1<<h;
-        // ptr=ptr>>1;
-        // node *buf=*anc;
-        // for(int i=0; i < h-1; i++)
-        // {
-        //     assert(buf != NULL);
-        //     if(ptr&s)
-        //     {
-        //         buf=buf->right;
-        //     }
-        //     else
-        //     {
-        //         buf=buf->left;
-        //     }
-        //     ptr=ptr>>1;
-        // }
         node *buf;
         nodeAt(&buf, *anc, (node::size)/2);
         if(1&(node::size)){buf->right=Node;}
@@ -104,23 +90,8 @@ void insert(node **head, node **anc, int val)
 void heapifyPop(node **anc, node *p)
 {
     if(node::size==1){*anc=NULL;return;}
-    int s=node::size, h=log2(node::size);
-    int ptr=1<<h;
-    ptr=ptr>>1;
-    node *buf=*anc;
-    for(int i=0; i < h; i++)
-    {
-        assert(buf != NULL);
-        if(ptr&s)
-        {
-            buf=buf->right;
-        }
-        else
-        {
-            buf=buf->left;
-        }
-        ptr=ptr>>1;
-    }
+    node *buf = NULL;
+    nodeAt(&buf, *anc, node::size);
     assert(buf->left==NULL && buf->right==NULL);
     if(buf->parent != NULL && (buf->parent)->left==buf)
     {
@@ -141,20 +112,41 @@ void heapifyPop(node **anc, node *p)
         assert((buf->parent)->right==p);
         (buf->parent)->right=buf;
     }
-    int lval=INT_MIN/2, rval=INT_MIN/2;
-    if(buf->left!=NULL)
+    while(buf != NULL)
     {
-        lval=(buf->left)->val;
+        int lval=INT_MIN/2, rval=INT_MIN/2;
+        if(buf->left!=NULL)
+        {
+            lval=(buf->left)->val;
+        }
+        if(buf->right!=NULL)
+        {
+            rval=(buf->right)->val;
+        }
+        if(lval==rval && lval == INT_MIN/2)break;
+        if(max(rval, lval) < buf->val)break;
+        if(rval <= lval)
+        {
+            //right child to be swapped to parent i.e leftSwap
+            swapLeft(buf, buf->left);
+            // buf=buf->left;
+        }
+        else
+        {
+            swapRight(buf, buf->right);
+            // buf=buf->right;
+        }
     }
-    if(buf->right!=NULL)
+    assert(buf != NULL);
+    if(p==*anc)
     {
-        rval=(buf->right)->val;
+        *anc=buf;
+        while((*anc)->parent!=NULL)
+        {
+            *anc=(*anc)->parent;
+        }
     }
-    if(lval==rval && lval == INT_MIN/2)return;
-    // if(lval < rval)
-    // {
-    //     buf
-    // }
+    return;
 }
 
 inline int Max(node *anc)
@@ -277,5 +269,25 @@ void nodeAt(node **buf, node *anc, int s=node::size)
         }
         ptr=ptr>>1;
     }
+    return;
+}
+
+void Pop(node **head, node **anc)
+{
+    if(*head==NULL)
+    {
+        assert(*anc==NULL);
+        cout<<"The queue is already empty.\n";
+        return;
+    }
+    if((*head)->next==NULL)
+    {
+        *head=NULL;
+        *anc=NULL;
+        return;
+    }
+    node *p = *head;
+    *head= p->next;
+    heapifyPop(anc, p);
     return;
 }
