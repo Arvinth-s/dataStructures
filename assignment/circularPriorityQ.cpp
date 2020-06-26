@@ -68,20 +68,20 @@ void insert(node **head, node **anc, int val)
     {
         assert(*anc==NULL);
         *head=new node(val);
+        (*head)->next=*head;
         *anc=*head;
         return;
     }
     else
     {
-        node* Node=new node(val);
+        node* Node=new node(val, (*head)->next);
         node *buf;
         nodeAt(&buf, *anc, (node::size)/2);
         if(1&(node::size)){buf->right=Node;}
         else {buf->left=Node;}
         Node->parent=buf;
-        node* temp=*head;
-        while(temp->next != NULL)temp=temp->next;
-        temp->next=Node;
+        (*head)->next=Node;
+        *head=Node;
         heapifyInsert(anc, Node);
         return;
     }
@@ -157,14 +157,14 @@ void Pop(node **head, node **anc)
         cout<<"The queue is already empty.\n";
         return;
     }
-    if((*head)->next==NULL)
+    if((*head)->next==*head)
     {
         *head=NULL;
         *anc=NULL;
         return;
     }
-    node *p = *head;
-    *head= p->next;
+    node *p = (*head)->next;
+    (*head)->next=((*head)->next)->next;
     heapifyPop(anc, p);
     return;
 }
@@ -268,7 +268,9 @@ inline int Max(node *anc)
 void printList(node *head)
 {
     printf("queue:\n");
-    while(head != NULL)
+    node* ref= head;
+    cout<<head->val<<" ";
+    while(head != ref)
     {
         cout<<head->val<<" ";
         head=head->next;
