@@ -76,37 +76,21 @@ int main()
 //O(logn)
 void heapifyInsert(node **anc, node *p)
 {
-    // printHeap(*anc);
     node *ptemp=p->parent;
     while(ptemp != NULL && p->val > ptemp->val)
     {
         if(ptemp->left == p)
         {
-            // cout<<"0.p: ";
-            // details(p);
-            // cout<<"0.ptemp: ";
-            // details(ptemp);
             swapLeft(ptemp, p);
-            // cout<<"left swap: ";
         }
         else
         {
-            // cout<<"0.p: ";
-            // details(p);
-            // cout<<"0.ptemp: ";
-            // details(ptemp);
+
             swapRight(ptemp, p);
-            // cout<<"0.p: ";
-            // details(p);
-            // cout<<"0.ptemp: ";
-            // details(ptemp);
-            // cout<<"right swap: ";
         }
         ptemp=p->parent;
-        if(ptemp == NULL){assert((*anc)->parent != NULL); (*anc)=p;break;}//printHeap(*anc);break;}
-        // printHeap(*anc);
+        if(ptemp == NULL){assert((*anc)->parent != NULL); (*anc)=p;break;}
     }
-    // printHeap(*anc);
     return;
 }
 
@@ -142,25 +126,51 @@ void heapifyPop(node **anc, node *p)
     if(node::size==1){*anc=NULL;return;}
     node *buf = NULL;
     nodeAt(&buf, *anc, node::size);
-    assert(buf->left==NULL && buf->right==NULL);
-    if(buf->parent != NULL && (buf->parent)->left==buf)
+    if(buf==p)
+    {
+        assert(p->parent);
+        if((p->parent)->left==p)(p->parent)->left=NULL;
+        else
+        {
+            assert((p->parent)->right==p);
+            (p->parent)->right=NULL;
+        }
+        
+        free(p);
+        return;
+    }
+    assert(!buf->left && !(buf->right));
+    if(buf->parent && ((buf->parent)->left==buf))
     {
         assert((buf->parent)->right==NULL);
         (buf->parent)->left=NULL;
     }
-    else
+    else if(buf->parent)
     {
-        assert((buf->parent)->left != NULL && (buf->parent)->right==buf);
+        assert((buf->parent)->left);
+        assert((buf->parent)->right==buf);
         (buf->parent)->right=NULL;
     }
     buf->parent=p->parent;
-    buf->left=p->left;
-    buf->right=p->right;
-    if(buf->parent != NULL && (buf->parent)->left==p)(buf->parent)->left=buf;
-    else if(buf->parent != NULL)
+    if(p->left != buf)buf->left=p->left;
+    if(buf->left)(buf->left)->parent=buf;
+    if(p->right != buf)buf->right=p->right;
+    if(buf->right)(buf->right)->parent=buf;
+    if(buf->parent && (buf->parent)->left==p)(buf->parent)->left=buf;
+    else if(buf->parent)
     {
+        //check the edge case when the node to be removed is leaf node
+        // if((buf->parent)->right!=p)
+        // {
+        //     cout<<"buf->parent: "<<(buf->parent)->val<<" buf:"<<buf->val<<endl;
+        //     cout<<"buf->parent->right: "<<((buf->parent)->right)->val<<endl;
+        //     assert((buf->parent)->right == NULL);
+        // }
+        // else
+        // {
         assert((buf->parent)->right==p);
         (buf->parent)->right=buf;
+        // }
     }
     while(buf != NULL)
     {
@@ -179,13 +189,19 @@ void heapifyPop(node **anc, node *p)
         {
             //right child to be swapped to parent i.e leftSwap
             swapLeft(buf, buf->left);
-            // buf=buf->left;
+            
         }
         else
         {
             swapRight(buf, buf->right);
             // buf=buf->right;
         }
+        if(buf->parent)
+        {
+            assert((buf->parent)->left==buf || (buf->parent)->left==buf);
+        }
+        if(buf->right)assert((buf->right)->parent=buf);
+        if(buf->left)assert((buf->left)->parent=buf);
     }
     assert(buf != NULL);
     if(p==*anc)
@@ -196,6 +212,7 @@ void heapifyPop(node **anc, node *p)
             *anc=(*anc)->parent;
         }
     }
+    free(p);
     return;
 }
 
@@ -224,50 +241,9 @@ void Pop(node **head, node **anc)
 }
 
 //O(1)
+//swap left child to parent
 inline void swapLeft(node *ptemp, node *p)
 {
-//     node* temp=ptemp->right;
-//     ptemp->right=p->right;
-//     p->right=temp;
-//     cout<<"1.p: ";
-//     details(p);
-//     cout<<"1.ptemp: ";
-//     details(ptemp);
-//     //p->right; ptemp->right
-//     ptemp->left=p->left;
-//     p->left=ptemp;
-//     assert(p->left != p);
-//     //ptemp->left; p->left
-//     p->parent=ptemp->parent;
-//     //p parent; ptemp->parent;
-//     cout<<"2.p: ";
-//     details(p);
-//     cout<<"2.ptemp: ";
-//     details(ptemp);
-//     if(ptemp->parent!=NULL && (ptemp->parent)->left==ptemp)
-//     {
-//         (ptemp->parent)->left=p;
-//     }
-//     else if(ptemp->parent!=NULL)
-//     {
-//         assert((ptemp->parent)->right=ptemp);
-//         (ptemp->parent)->right=p;
-//     }
-//     ptemp->parent=p;
-//     cout<<"3.p: ";
-//     details(p);
-//     cout<<"3.ptemp: ";
-//     details(ptemp);
-//     //parent of ptemp
-//     if(ptemp->left != NULL)(ptemp->left)->parent=ptemp;
-//     if(ptemp->right!= NULL)(ptemp->right)->parent=ptemp;
-//     //children of p
-//     assert(ptemp->left != ptemp);
-//     assert(ptemp->right != ptemp);
-//     assert(ptemp->parent != ptemp);
-//     assert(p->left != p);
-//     assert(p->right != p);
-//     assert(p->parent != p);
     node* temp=p->right;
     p->right=ptemp->right;
     ptemp->right=temp;
@@ -289,31 +265,9 @@ inline void swapLeft(node *ptemp, node *p)
 }
 
 //O(1)
+//swap right child to parent
 inline void swapRight(node *ptemp, node *p)
 {
-    // node* temp=ptemp->left;
-    // ptemp->left=p->left;
-    // p->left=temp;
-    // //p->left; ptemp->left
-    // ptemp->right=p->right;
-    // p->right=ptemp;
-    // //ptemp->right; p->right
-    // p->parent=ptemp->parent;
-    // //p parent; ptemp->parent;
-    // if(ptemp->parent!=NULL && (ptemp->parent)->left==ptemp)
-    // {
-    //     (ptemp->parent)->left=p;
-    // }
-    // else if(ptemp->parent!=NULL)
-    // {
-    //     assert((ptemp->parent)->right=ptemp);
-    //     (ptemp->parent)->right=p;
-    // }
-    // ptemp->parent=p;
-    // //parent of ptemp
-    // if(ptemp->left != NULL)(ptemp->left)->parent=ptemp;
-    // if(ptemp->right!= NULL)(ptemp->right)->parent=ptemp;
-    // //children of p
     node* temp=p->left;
     p->left=ptemp->left;
     ptemp->left=temp;
