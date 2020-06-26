@@ -35,7 +35,7 @@ void Pop(node **head, node **anc);
 
 int main()
 {
-    node *head=NULL, *anc=NULL;
+    // node *head=NULL, *anc=NULL;
     // int op=1;
     // printf("1.push\n2.pop\n3.Max\n4.Content of queue\n5.Content of heap\n6.operations\n");
     // while(op > 0 && op < 7)
@@ -54,47 +54,59 @@ int main()
     //         default: exit(0);
     //     }
     // }
-    Push(&head, &anc, 78);
-    Push(&head, &anc, 87);
-    Push(&head, &anc, 1000);
-    Push(&head, &anc, 90);
+    int arr[]={13, 123, 51, 12, 1, 13, 52, 1243, 12365, 34, 1245, 12512};
+    int s=sizeof(arr)/sizeof(arr[0]);
+    node *head=NULL, *anc=NULL;
+    node::size=0;
+    for(int i=0; i<s; i++)
+    {
+        Push(&head, &anc, arr[i]);
+        printQ(head);
+        printHeap(anc);
+    }
+    for(int i=0; i<s; i++)
+    {
+        Pop(&head, &anc);
+        printQ(head);
+        printHeap(anc);
+    }
     return 0;
 }
 
 //O(logn)
 void heapifyInsert(node **anc, node *p)
 {
-    printHeap(*anc);
+    // printHeap(*anc);
     node *ptemp=p->parent;
     while(ptemp != NULL && p->val > ptemp->val)
     {
         if(ptemp->left == p)
         {
-            cout<<"0.p: ";
-            details(p);
-            cout<<"0.ptemp: ";
-            details(ptemp);
+            // cout<<"0.p: ";
+            // details(p);
+            // cout<<"0.ptemp: ";
+            // details(ptemp);
             swapLeft(ptemp, p);
-            cout<<"left swap: ";
+            // cout<<"left swap: ";
         }
         else
         {
-            cout<<"0.p: ";
-            details(p);
-            cout<<"0.ptemp: ";
-            details(ptemp);
+            // cout<<"0.p: ";
+            // details(p);
+            // cout<<"0.ptemp: ";
+            // details(ptemp);
             swapRight(ptemp, p);
-            cout<<"0.p: ";
-            details(p);
-            cout<<"0.ptemp: ";
-            details(ptemp);
-            cout<<"right swap: ";
+            // cout<<"0.p: ";
+            // details(p);
+            // cout<<"0.ptemp: ";
+            // details(ptemp);
+            // cout<<"right swap: ";
         }
         ptemp=p->parent;
-        if(ptemp == NULL){assert((*anc)->parent != NULL); (*anc)=p;printHeap(*anc);break;}
-        printHeap(*anc);
+        if(ptemp == NULL){assert((*anc)->parent != NULL); (*anc)=p;break;}//printHeap(*anc);break;}
+        // printHeap(*anc);
     }
-    printHeap(*anc);
+    // printHeap(*anc);
     return;
 }
 
@@ -214,42 +226,60 @@ void Pop(node **head, node **anc)
 //O(1)
 inline void swapLeft(node *ptemp, node *p)
 {
-    node* temp=ptemp->right;
-    ptemp->right=p->right;
-    p->right=temp;
-    cout<<"1.p: ";
-    details(p);
-    cout<<"1.ptemp: ";
-    details(ptemp);
-    //p->right; ptemp->right
+//     node* temp=ptemp->right;
+//     ptemp->right=p->right;
+//     p->right=temp;
+//     cout<<"1.p: ";
+//     details(p);
+//     cout<<"1.ptemp: ";
+//     details(ptemp);
+//     //p->right; ptemp->right
+//     ptemp->left=p->left;
+//     p->left=ptemp;
+//     assert(p->left != p);
+//     //ptemp->left; p->left
+//     p->parent=ptemp->parent;
+//     //p parent; ptemp->parent;
+//     cout<<"2.p: ";
+//     details(p);
+//     cout<<"2.ptemp: ";
+//     details(ptemp);
+//     if(ptemp->parent!=NULL && (ptemp->parent)->left==ptemp)
+//     {
+//         (ptemp->parent)->left=p;
+//     }
+//     else if(ptemp->parent!=NULL)
+//     {
+//         assert((ptemp->parent)->right=ptemp);
+//         (ptemp->parent)->right=p;
+//     }
+//     ptemp->parent=p;
+//     cout<<"3.p: ";
+//     details(p);
+//     cout<<"3.ptemp: ";
+//     details(ptemp);
+//     //parent of ptemp
+//     if(ptemp->left != NULL)(ptemp->left)->parent=ptemp;
+//     if(ptemp->right!= NULL)(ptemp->right)->parent=ptemp;
+//     //children of p
+//     assert(ptemp->left != ptemp);
+//     assert(ptemp->right != ptemp);
+//     assert(ptemp->parent != ptemp);
+//     assert(p->left != p);
+//     assert(p->right != p);
+//     assert(p->parent != p);
+    node* temp=p->right;
+    p->right=ptemp->right;
+    ptemp->right=temp;
+    if(temp)temp->parent=ptemp;
+    if(p->right)(p->right)->parent=p;
     ptemp->left=p->left;
+    if(ptemp->left)(ptemp->left)->parent=ptemp;
     p->left=ptemp;
-    assert(p->left != p);
-    //ptemp->left; p->left
     p->parent=ptemp->parent;
-    //p parent; ptemp->parent;
-    cout<<"2.p: ";
-    details(p);
-    cout<<"2.ptemp: ";
-    details(ptemp);
-    if(ptemp->parent!=NULL && (ptemp->parent)->left==ptemp)
-    {
-        (ptemp->parent)->left=p;
-    }
-    else if(ptemp->parent!=NULL)
-    {
-        assert((ptemp->parent)->right=ptemp);
-        (ptemp->parent)->right=p;
-    }
+    if(p->parent && (p->parent)->left == ptemp)(p->parent)->left=p;
+    else if((p->parent)){assert((p->parent)->right != NULL); (p->parent)->right=p;}
     ptemp->parent=p;
-    cout<<"3.p: ";
-    details(p);
-    cout<<"3.ptemp: ";
-    details(ptemp);
-    //parent of ptemp
-    if(ptemp->left != NULL)(ptemp->left)->parent=ptemp;
-    if(ptemp->right!= NULL)(ptemp->right)->parent=ptemp;
-    //children of p
     assert(ptemp->left != ptemp);
     assert(ptemp->right != ptemp);
     assert(ptemp->parent != ptemp);
@@ -261,29 +291,47 @@ inline void swapLeft(node *ptemp, node *p)
 //O(1)
 inline void swapRight(node *ptemp, node *p)
 {
-    node* temp=ptemp->left;
-    ptemp->left=p->left;
-    p->left=temp;
-    //p->left; ptemp->left
+    // node* temp=ptemp->left;
+    // ptemp->left=p->left;
+    // p->left=temp;
+    // //p->left; ptemp->left
+    // ptemp->right=p->right;
+    // p->right=ptemp;
+    // //ptemp->right; p->right
+    // p->parent=ptemp->parent;
+    // //p parent; ptemp->parent;
+    // if(ptemp->parent!=NULL && (ptemp->parent)->left==ptemp)
+    // {
+    //     (ptemp->parent)->left=p;
+    // }
+    // else if(ptemp->parent!=NULL)
+    // {
+    //     assert((ptemp->parent)->right=ptemp);
+    //     (ptemp->parent)->right=p;
+    // }
+    // ptemp->parent=p;
+    // //parent of ptemp
+    // if(ptemp->left != NULL)(ptemp->left)->parent=ptemp;
+    // if(ptemp->right!= NULL)(ptemp->right)->parent=ptemp;
+    // //children of p
+    node* temp=p->left;
+    p->left=ptemp->left;
+    ptemp->left=temp;
+    if(temp)temp->parent=ptemp;
+    if(p->left)(p->left)->parent=p;
     ptemp->right=p->right;
+    if(ptemp->right)(ptemp->right)->parent=ptemp;
     p->right=ptemp;
-    //ptemp->right; p->right
     p->parent=ptemp->parent;
-    //p parent; ptemp->parent;
-    if(ptemp->parent!=NULL && (ptemp->parent)->left==ptemp)
-    {
-        (ptemp->parent)->left=p;
-    }
-    else if(ptemp->parent!=NULL)
-    {
-        assert((ptemp->parent)->right=ptemp);
-        (ptemp->parent)->right=p;
-    }
+    if(p->parent && (p->parent)->right == ptemp)(p->parent)->right=p;
+    else if((p->parent)){assert((p->parent)->left != NULL); (p->parent)->left=p;}
     ptemp->parent=p;
-    //parent of ptemp
-    if(ptemp->left != NULL)(ptemp->left)->parent=ptemp;
-    if(ptemp->right!= NULL)(ptemp->right)->parent=ptemp;
-    //children of p
+    assert(ptemp->right != ptemp);
+    assert(ptemp->left != ptemp);
+    assert(ptemp->parent != ptemp);
+    assert(p->right != p);
+    assert(p->left != p);
+    assert(p->parent != p);
 }
 
 //O(logn)
@@ -331,6 +379,7 @@ void printQ(node *head)
     printf("queue:\n");
     node* ref= head;
     cout<<head->val<<" ";
+    head=head->next;
     while(head != ref)
     {
         cout<<head->val<<" ";
