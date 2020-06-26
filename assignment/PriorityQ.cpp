@@ -6,8 +6,8 @@ TIME COMPLEXITY
 2. deletion: O(logn)
 3. max: O(1)
 
-since insertion is O(n), the same problem with this time complexity can be easily implemented with array
-
+since insertion is O(n), the same problem with this time complexity can be easily implemented
+with deletion and insertion time complexity as O(n). 
 */
 
 #include<bits/stdc++.h>
