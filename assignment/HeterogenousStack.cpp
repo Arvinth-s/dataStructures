@@ -3,12 +3,14 @@
 #define maxSize 10
 using namespace std;
 
+char reff[]={"hi"};
+
 struct node{
     protected:
-    char val;
+    char *val;
     public:
     node* next;
-    node(char val){this->val=val;}
+    node(char *val){this->val=val;}
     virtual void print()
     {
         cout<<val<<endl;
@@ -20,12 +22,14 @@ struct inode:node{
     int val;
     public:
     node* next;
-    inode(int val):node('o'){this->val=val;}
+    inode(int val):node(reff){this->val=val;}
     void print()
     {
         cout<<val<<endl;
     }
 };
+
+bool checkNum(char *c);
 
 node *top=NULL;
 int size=0;
@@ -67,29 +71,23 @@ int main()
         cin>>op;
         if(op==1)
         {
-            int ch;
-            cout<<"1.integer\n2.char\n";
-            cin>>ch;
-            if(ch==1)
+            char *c = new char[20];
+            cin.getline(c, maxSize);
+            cin.getline(c, maxSize);
+            bool isInt=checkNum(c);
+            if(isInt)
             {
-                cout<<"enter int: ";
-                int ele;
-                cin>>ele;
-                inode* Node=new inode(ele); 
+                int it;
+                sscanf(c, "%d", &it);
+                inode* Node=new inode(it); 
                 push(Node);
             }
-            if(ch==2)
+            else
             {
-                cout<<"enter char: ";
-                char ele;
-                cin>>ele;
-                node* Node=new node(ele);
+                node* Node=new node(c);
                 push(Node);
             }
-            if(ch<1||ch>2)
-            {
-                exit(0);
-            }
+            
         }
         if(op==2)
         {
@@ -110,4 +108,15 @@ int main()
         }
     }
     return 0;
+}
+
+bool checkNum(char *c)
+{
+    int i=0;
+    while(c[i] !='\0')
+    {
+        if(c[i] < '0' || c[i++] > '9')
+            return false;
+    }
+    return true;
 }
