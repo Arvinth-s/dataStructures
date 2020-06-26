@@ -16,9 +16,9 @@ inline void swapLeft(node *a, node *b);
 inline void swapRight(node *a, node *b);
 void nodeAt(node **buf, node *anc, int s);
 void printHeap(node *anc);
-void printList(node *head);
-void heapifyInsert(node **anc, node *p);
-void insert(node **head, node **anc, int val);
+void printQ(node *head);
+void heapifyPush(node **anc, node *p);
+void Push(node **head, node **anc, int val);
 inline int Max(node *anc);
 void heapifyPop(node **anc, node *p);
 void Pop(node **head, node **anc);
@@ -32,36 +32,22 @@ int main()
     node::size=0;
     for(int i=0; i<s; i++)
     {
-        insert(&head, &anc, arr[i]);
-        printList(head);
+        Push(&head, &anc, arr[i]);
+        printQ(head);
         printHeap(anc);
     }
-    Pop(&head, &anc);
-    printList(head);
-    printHeap(anc);
+    for(int i=0; i<s; i++)
+    {
+        Pop(&head, &anc);
+        printQ(head);
+        printHeap(anc);
+    }
     return 0;
 }
 
-void heapifyInsert(node **anc, node *p)
-{
-    node *ptemp=p->parent;
-    while(ptemp != NULL && p->val > ptemp->val)
-    {
-        if(ptemp->left == p)
-        {
-            swapLeft(ptemp, p);
-        }
-        else
-        {
-            swapRight(ptemp, p);
-        }
-        ptemp=p->parent;
-        if(ptemp == NULL){assert((*anc)->parent != NULL); (*anc)=p; return;}
-    }
-    return;
-}
 
-void insert(node **head, node **anc, int val)
+
+void Push(node **head, node **anc, int val)
 {
     node::size++;
     if(*head==NULL)
@@ -82,72 +68,11 @@ void insert(node **head, node **anc, int val)
         node* temp=*head;
         while(temp->next != NULL)temp=temp->next;
         temp->next=Node;
-        heapifyInsert(anc, Node);
+        heapifyPush(anc, Node);
         return;
     }
 }
 
-void heapifyPop(node **anc, node *p)
-{
-    if(node::size==1){*anc=NULL;return;}
-    node *buf = NULL;
-    nodeAt(&buf, *anc, node::size);
-    assert(buf->left==NULL && buf->right==NULL);
-    if(buf->parent != NULL && (buf->parent)->left==buf)
-    {
-        assert((buf->parent)->right==NULL);
-        (buf->parent)->left=NULL;
-    }
-    else
-    {
-        assert((buf->parent)->left != NULL && (buf->parent)->right==buf);
-        (buf->parent)->right=NULL;
-    }
-    buf->parent=p->parent;
-    buf->left=p->left;
-    buf->right=p->right;
-    if(buf->parent != NULL && (buf->parent)->left==p)(buf->parent)->left=buf;
-    else if(buf->parent != NULL)
-    {
-        assert((buf->parent)->right==p);
-        (buf->parent)->right=buf;
-    }
-    while(buf != NULL)
-    {
-        int lval=INT_MIN/2, rval=INT_MIN/2;
-        if(buf->left!=NULL)
-        {
-            lval=(buf->left)->val;
-        }
-        if(buf->right!=NULL)
-        {
-            rval=(buf->right)->val;
-        }
-        if(lval==rval && lval == INT_MIN/2)break;
-        if(max(rval, lval) < buf->val)break;
-        if(rval <= lval)
-        {
-            //right child to be swapped to parent i.e leftSwap
-            swapLeft(buf, buf->left);
-            // buf=buf->left;
-        }
-        else
-        {
-            swapRight(buf, buf->right);
-            // buf=buf->right;
-        }
-    }
-    assert(buf != NULL);
-    if(p==*anc)
-    {
-        *anc=buf;
-        while((*anc)->parent!=NULL)
-        {
-            *anc=(*anc)->parent;
-        }
-    }
-    return;
-}
 
 void Pop(node **head, node **anc)
 {
@@ -166,70 +91,10 @@ void Pop(node **head, node **anc)
     node *p = *head;
     *head= p->next;
     heapifyPop(anc, p);
+    node::size--;
     return;
 }
 
-
-inline void swapLeft(node *ptemp, node *p)
-{
-    node* temp=ptemp->right;
-    ptemp->right=p->right;
-    p->right=temp;
-    //p->right; ptemp->right
-    ptemp->left=p->left;
-    p->left=ptemp;
-    assert(p->left != p);
-    //ptemp->left; p->left
-    p->parent=ptemp->parent;
-    //p parent; ptemp->parent;
-    if(ptemp->parent!=NULL && (ptemp->parent)->left==ptemp)
-    {
-        (ptemp->parent)->left=p;
-    }
-    else if(ptemp->parent!=NULL)
-    {
-        assert((ptemp->parent)->right=ptemp);
-        (ptemp->parent)->right=p;
-    }
-    ptemp->parent=p;
-    //parent of ptemp
-    if(ptemp->left != NULL)(ptemp->left)->parent=ptemp;
-    if(ptemp->right!= NULL)(ptemp->right)->parent=ptemp;
-    //children of p
-    assert(ptemp->left != ptemp);
-    assert(ptemp->right != ptemp);
-    assert(ptemp->parent != ptemp);
-    assert(p->left != p);
-    assert(p->right != p);
-    assert(p->parent != p);
-}
-
-inline void swapRight(node *ptemp, node *p)
-{
-    node* temp=ptemp->left;
-    ptemp->left=p->left;
-    p->left=temp;
-    //p->left; ptemp->left
-    ptemp->right=p->right;
-    p->right=ptemp;
-    //ptemp->right; p->right
-    p->parent=ptemp->parent;
-    //p parent; ptemp->parent;
-    if(ptemp->parent!=NULL && (ptemp->parent)->left==ptemp)
-    {
-        (ptemp->parent)->left=p;
-    }
-    else if(ptemp->parent!=NULL)
-    {
-        assert((ptemp->parent)->right=ptemp);
-        (ptemp->parent)->right=p;
-    }
-    ptemp->parent=p;
-    //parent of ptemp
-    if(ptemp->left != NULL)(ptemp->left)->parent=ptemp;
-    if(ptemp->right!= NULL)(ptemp->right)->parent=ptemp;
-    //children of p
-}
 
 void nodeAt(node **buf, node *anc, int s=node::size)
 {
@@ -265,8 +130,182 @@ inline int Max(node *anc)
     return(anc->val);
 }
 
-void printList(node *head)
+
+
+//O(logn)
+void heapifyPush(node **anc, node *p)
 {
+    node *ptemp=p->parent;
+    while(ptemp != NULL && p->val > ptemp->val)
+    {
+        //swap left child and parent
+        if(ptemp->left == p)
+        {
+            swapLeft(ptemp, p);
+        }
+        else
+        {
+            //swap right child and parent
+            swapRight(ptemp, p);
+        }
+        //p remains same
+        //update ptemp
+        ptemp=p->parent;
+        if(ptemp == NULL){assert((*anc)->parent != NULL); (*anc)=p;break;}
+    }
+    return;
+}
+
+//O(logn)
+void heapifyPop(node **anc, node *p)
+{
+    if(node::size==1){*anc=NULL;return;}
+    node *buf = NULL;
+    nodeAt(&buf, *anc, node::size);
+    //p is the last node 
+    //p is one of leaf node
+    if(buf==p)
+    {
+        //since buf size > 1
+        assert(p->parent);
+        if((p->parent)->left==p)(p->parent)->left=NULL;
+        else
+        {
+            assert((p->parent)->right==p);
+            (p->parent)->right=NULL;
+        }
+        free(p);
+        return;
+    }
+    //since buf is a leaf node
+    assert(!buf->left && !(buf->right));
+    if(buf->parent && ((buf->parent)->left==buf))
+    {
+        //since buf is last node 
+        //if buf is left child there can be no right child
+        assert((buf->parent)->right==NULL);
+        (buf->parent)->left=NULL;
+    }
+    else if(buf->parent)
+    {
+        //since buf is left child there should be a right child
+        assert((buf->parent)->left);
+        assert((buf->parent)->right==buf);
+        (buf->parent)->right=NULL;
+    }
+    buf->parent=p->parent;
+    if(p->left != buf)buf->left=p->left;
+    if(buf->left)(buf->left)->parent=buf;
+    //to avoid loop
+    if(p->right != buf)buf->right=p->right;
+    if(buf->right)(buf->right)->parent=buf;
+    //top avoid loop
+    if(buf->parent && (buf->parent)->left==p)(buf->parent)->left=buf;
+    else if(buf->parent)
+    {
+        //check the edge case when the node to be removed is leaf node
+        assert((buf->parent)->right==p);
+        (buf->parent)->right=buf;
+    }
+    while(buf != NULL)
+    {
+        int lval=INT_MIN/2, rval=INT_MIN/2;
+        if(buf->left!=NULL)
+        {
+            lval=(buf->left)->val;
+        }
+        if(buf->right!=NULL)
+        {
+            rval=(buf->right)->val;
+        }
+        if(lval==rval && lval == INT_MIN/2)break;
+        if(max(rval, lval) < buf->val)break;
+        if(rval <= lval)
+        {
+            //since left child is greater
+            //parent should be swapped with left child
+            swapLeft(buf, buf->left);
+            
+        }
+        else
+        {
+            //parent to be swapped with right child
+            swapRight(buf, buf->right);
+        }
+        //doubt
+        // if(buf->parent)
+        // {
+        //     assert((buf->parent)->left==buf || (buf->parent)->left==buf);
+        // }
+        if(buf->right)assert((buf->right)->parent=buf);
+        if(buf->left)assert((buf->left)->parent=buf);
+    }
+    //check whether we are deleting the top node
+    assert(buf != NULL);
+    if(p==*anc)
+    {
+        //the common ancestor of all the nodes is the topmost node
+        *anc=buf;
+        while((*anc)->parent!=NULL)
+        {
+            *anc=(*anc)->parent;
+        }
+    }
+    free(p);
+    return;
+}
+
+//O(1)
+//swap left child to parent
+inline void swapLeft(node *ptemp, node *p)
+{
+    node* temp=p->right;
+    p->right=ptemp->right;
+    ptemp->right=temp;
+    if(temp)temp->parent=ptemp;
+    if(p->right)(p->right)->parent=p;
+    ptemp->left=p->left;
+    if(ptemp->left)(ptemp->left)->parent=ptemp;
+    p->left=ptemp;
+    p->parent=ptemp->parent;
+    if(p->parent && (p->parent)->left == ptemp)(p->parent)->left=p;
+    else if((p->parent)){assert((p->parent)->right != NULL); (p->parent)->right=p;}
+    ptemp->parent=p;
+    assert(ptemp->left != ptemp);
+    assert(ptemp->right != ptemp);
+    assert(ptemp->parent != ptemp);
+    assert(p->left != p);
+    assert(p->right != p);
+    assert(p->parent != p);
+}
+
+//O(1)
+//swap right child to parent
+inline void swapRight(node *ptemp, node *p)
+{
+    node* temp=p->left;
+    p->left=ptemp->left;
+    ptemp->left=temp;
+    if(temp)temp->parent=ptemp;
+    if(p->left)(p->left)->parent=p;
+    ptemp->right=p->right;
+    if(ptemp->right)(ptemp->right)->parent=ptemp;
+    p->right=ptemp;
+    p->parent=ptemp->parent;
+    if(p->parent && (p->parent)->right == ptemp)(p->parent)->right=p;
+    else if((p->parent)){assert((p->parent)->left != NULL); (p->parent)->left=p;}
+    ptemp->parent=p;
+    assert(ptemp->right != ptemp);
+    assert(ptemp->left != ptemp);
+    assert(ptemp->parent != ptemp);
+    assert(p->right != p);
+    assert(p->left != p);
+    assert(p->parent != p);
+}
+
+void printQ(node *head)
+{
+    if(head==NULL){cout<<"Queue is empty.\n";return;}
     printf("queue:\n");
     while(head != NULL)
     {
@@ -279,6 +318,7 @@ void printList(node *head)
 
 void printHeap(node *top)
 {
+    if(top==NULL){cout<<"Heap is empty.\n";return;}
     printf("heap:\n");
     if(top==NULL)return;
     queue<node *> q;

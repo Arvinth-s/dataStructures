@@ -26,7 +26,7 @@ inline void swapRight(node *a, node *b);
 void nodeAt(node **buf, node *anc, int s);
 void printHeap(node *anc);
 void printQ(node *head);
-void heapifyInsert(node **anc, node *p);
+void heapifyPush(node **anc, node *p);
 void Push(node **head, node **anc, int val);
 inline int Max(node *anc);
 void heapifyPop(node **anc, node *p);
@@ -75,7 +75,7 @@ int main()
 }
 
 //O(logn)
-void heapifyInsert(node **anc, node *p)
+void heapifyPush(node **anc, node *p)
 {
     node *ptemp=p->parent;
     while(ptemp != NULL && p->val > ptemp->val)
@@ -122,7 +122,7 @@ void Push(node **head, node **anc, int val)
         Node->parent=buf;
         (*head)->next=Node;
         *head=Node;
-        heapifyInsert(anc, Node);
+        heapifyPush(anc, Node);
         return;
     }
 }
@@ -202,10 +202,11 @@ void heapifyPop(node **anc, node *p)
             //parent to be swapped with right child
             swapRight(buf, buf->right);
         }
-        if(buf->parent)
-        {
-            assert((buf->parent)->left==buf || (buf->parent)->left==buf);
-        }
+        //doubt
+        // if(buf->parent)
+        // {
+        //     assert((buf->parent)->left==buf || (buf->parent)->left==buf);
+        // }
         if(buf->right)assert((buf->right)->parent=buf);
         if(buf->left)assert((buf->left)->parent=buf);
     }
