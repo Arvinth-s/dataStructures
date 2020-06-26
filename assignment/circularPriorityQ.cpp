@@ -35,41 +35,42 @@ void Pop(node **head, node **anc);
 
 int main()
 {
-    // node *head=NULL, *anc=NULL;
-    // int op=1;
-    // printf("1.push\n2.pop\n3.Max\n4.Content of queue\n5.Content of heap\n6.operations\n");
-    // while(op > 0 && op < 7)
-    // {
-    //     cout<<("option: ");
-    //     cin>>op;
-    //     int val;
-    //     switch(op)
-    //     {
-    //         case 1:cout<<"val: ";cin>>val;Push(&head, &anc, val);break;
-    //         case 2:Pop(&head, &anc);break;
-    //         case 3:cout<<Max(anc)<<endl;break;
-    //         case 4:printQ(head);break;
-    //         case 5:printHeap(anc);break;
-    //         case 6:printf("1.push\n2.pop\n3.Max\n4.Content of queue\n5.Content of heap\n6.operations\n");break;
-    //         default: exit(0);
-    //     }
-    // }
-    int arr[]={13, 123, 51, 12, 1, 13, 52, 1243, 12365, 34, 1245, 12512};
-    int s=sizeof(arr)/sizeof(arr[0]);
     node *head=NULL, *anc=NULL;
-    node::size=0;
-    for(int i=0; i<s; i++)
+    int op=1;
+    printf("1.push\n2.pop\n3.Max\n4.Content of queue\n5.Content of heap\n6.operations\n");
+    while(op > 0 && op < 7)
     {
-        Push(&head, &anc, arr[i]);
-        printQ(head);
-        printHeap(anc);
+        cout<<("option: ");
+        cin>>op;
+        int val;
+        switch(op)
+        {
+            case 1:cout<<"val: ";cin>>val;Push(&head, &anc, val);break;
+            case 2:Pop(&head, &anc);break;
+            case 3:cout<<Max(anc)<<endl;break;
+            case 4:printQ(head);break;
+            case 5:printHeap(anc);break;
+            case 6:printf("1.push\n2.pop\n3.Max\n4.Content of queue\n5.Content of heap\n6.operations\n");break;
+            default: exit(0);
+        }
     }
-    for(int i=0; i<s; i++)
-    {
-        Pop(&head, &anc);
-        printQ(head);
-        printHeap(anc);
-    }
+    //test input. Comment the remaining main
+    // int arr[]={13, 123, 51, 12, 1, 13, 52, 1243, 12365, 34, 1245, 12512};
+    // int s=sizeof(arr)/sizeof(arr[0]);
+    // node *head=NULL, *anc=NULL;
+    // node::size=0;
+    // for(int i=0; i<s; i++)
+    // {
+    //     Push(&head, &anc, arr[i]);
+    //     printQ(head);
+    //     printHeap(anc);
+    // }
+    // for(int i=0; i<s; i++)
+    // {
+    //     Pop(&head, &anc);
+    //     printQ(head);
+    //     printHeap(anc);
+    // }
     return 0;
 }
 
@@ -79,15 +80,18 @@ void heapifyInsert(node **anc, node *p)
     node *ptemp=p->parent;
     while(ptemp != NULL && p->val > ptemp->val)
     {
+        //swap left child and parent
         if(ptemp->left == p)
         {
             swapLeft(ptemp, p);
         }
         else
         {
-
+            //swap right child and parent
             swapRight(ptemp, p);
         }
+        //p remains same
+        //update ptemp
         ptemp=p->parent;
         if(ptemp == NULL){assert((*anc)->parent != NULL); (*anc)=p;break;}
     }
@@ -110,7 +114,9 @@ void Push(node **head, node **anc, int val)
     {
         node* Node=new node(val, (*head)->next);
         node *buf;
+        //find the parent of the node to be inserted
         nodeAt(&buf, *anc, (node::size)/2);
+        //find whether the node shoub be left child or right child
         if(1&(node::size)){buf->right=Node;}
         else {buf->left=Node;}
         Node->parent=buf;
@@ -126,8 +132,11 @@ void heapifyPop(node **anc, node *p)
     if(node::size==1){*anc=NULL;return;}
     node *buf = NULL;
     nodeAt(&buf, *anc, node::size);
+    //p is the last node 
+    //p is one of leaf node
     if(buf==p)
     {
+        //since buf size > 1
         assert(p->parent);
         if((p->parent)->left==p)(p->parent)->left=NULL;
         else
@@ -135,18 +144,21 @@ void heapifyPop(node **anc, node *p)
             assert((p->parent)->right==p);
             (p->parent)->right=NULL;
         }
-        
         free(p);
         return;
     }
+    //since buf is a leaf node
     assert(!buf->left && !(buf->right));
     if(buf->parent && ((buf->parent)->left==buf))
     {
+        //since buf is last node 
+        //if buf is left child there can be no right child
         assert((buf->parent)->right==NULL);
         (buf->parent)->left=NULL;
     }
     else if(buf->parent)
     {
+        //since buf is left child there should be a right child
         assert((buf->parent)->left);
         assert((buf->parent)->right==buf);
         (buf->parent)->right=NULL;
@@ -154,23 +166,16 @@ void heapifyPop(node **anc, node *p)
     buf->parent=p->parent;
     if(p->left != buf)buf->left=p->left;
     if(buf->left)(buf->left)->parent=buf;
+    //to avoid loop
     if(p->right != buf)buf->right=p->right;
     if(buf->right)(buf->right)->parent=buf;
+    //top avoid loop
     if(buf->parent && (buf->parent)->left==p)(buf->parent)->left=buf;
     else if(buf->parent)
     {
         //check the edge case when the node to be removed is leaf node
-        // if((buf->parent)->right!=p)
-        // {
-        //     cout<<"buf->parent: "<<(buf->parent)->val<<" buf:"<<buf->val<<endl;
-        //     cout<<"buf->parent->right: "<<((buf->parent)->right)->val<<endl;
-        //     assert((buf->parent)->right == NULL);
-        // }
-        // else
-        // {
         assert((buf->parent)->right==p);
         (buf->parent)->right=buf;
-        // }
     }
     while(buf != NULL)
     {
@@ -187,14 +192,15 @@ void heapifyPop(node **anc, node *p)
         if(max(rval, lval) < buf->val)break;
         if(rval <= lval)
         {
-            //right child to be swapped to parent i.e leftSwap
+            //since left child is greater
+            //parent should be swapped with left child
             swapLeft(buf, buf->left);
             
         }
         else
         {
+            //parent to be swapped with right child
             swapRight(buf, buf->right);
-            // buf=buf->right;
         }
         if(buf->parent)
         {
@@ -203,9 +209,11 @@ void heapifyPop(node **anc, node *p)
         if(buf->right)assert((buf->right)->parent=buf);
         if(buf->left)assert((buf->left)->parent=buf);
     }
+    //check whether we are deleting the top node
     assert(buf != NULL);
     if(p==*anc)
     {
+        //the common ancestor of all the nodes is the topmost node
         *anc=buf;
         while((*anc)->parent!=NULL)
         {
@@ -366,6 +374,7 @@ void printHeap(node *top)
     return;
 }
 
+//for debugging purpose
 inline void details(node *a)
 {
     if(a==NULL)return;
