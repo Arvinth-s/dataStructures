@@ -1,4 +1,12 @@
 //OM NAMO NARAYANA
+
+/*
+TIME COMPLEXITY
+1. insertion: O(logn)
+2. deletion: O(logn)
+3. max: O(logn)
+*/
+
 #include<bits/stdc++.h>
 using namespace std;
 
@@ -12,13 +20,14 @@ struct node{
 
 int node::size=0;
 
+inline void details(node *a);
 inline void swapLeft(node *a, node *b);
 inline void swapRight(node *a, node *b);
 void nodeAt(node **buf, node *anc, int s);
 void printHeap(node *anc);
-void printList(node *head);
+void printQ(node *head);
 void heapifyInsert(node **anc, node *p);
-void insert(node **head, node **anc, int val);
+void Push(node **head, node **anc, int val);
 inline int Max(node *anc);
 void heapifyPop(node **anc, node *p);
 void Pop(node **head, node **anc);
@@ -26,42 +35,71 @@ void Pop(node **head, node **anc);
 
 int main()
 {
-    int arr[]={13, 123, 51, 12, 1, 13, 52};
-    int s=sizeof(arr)/sizeof(arr[0]);
     node *head=NULL, *anc=NULL;
-    node::size=0;
-    for(int i=0; i<s; i++)
-    {
-        insert(&head, &anc, arr[i]);
-        printList(head);
-        printHeap(anc);
-    }
-    Pop(&head, &anc);
-    printList(head);
-    printHeap(anc);
+    // int op=1;
+    // printf("1.push\n2.pop\n3.Max\n4.Content of queue\n5.Content of heap\n6.operations\n");
+    // while(op > 0 && op < 7)
+    // {
+    //     cout<<("option: ");
+    //     cin>>op;
+    //     int val;
+    //     switch(op)
+    //     {
+    //         case 1:cout<<"val: ";cin>>val;Push(&head, &anc, val);break;
+    //         case 2:Pop(&head, &anc);break;
+    //         case 3:cout<<Max(anc)<<endl;break;
+    //         case 4:printQ(head);break;
+    //         case 5:printHeap(anc);break;
+    //         case 6:printf("1.push\n2.pop\n3.Max\n4.Content of queue\n5.Content of heap\n6.operations\n");break;
+    //         default: exit(0);
+    //     }
+    // }
+    Push(&head, &anc, 78);
+    Push(&head, &anc, 87);
+    Push(&head, &anc, 1000);
+    Push(&head, &anc, 90);
     return 0;
 }
 
+//O(logn)
 void heapifyInsert(node **anc, node *p)
 {
+    printHeap(*anc);
     node *ptemp=p->parent;
     while(ptemp != NULL && p->val > ptemp->val)
     {
         if(ptemp->left == p)
         {
+            cout<<"0.p: ";
+            details(p);
+            cout<<"0.ptemp: ";
+            details(ptemp);
             swapLeft(ptemp, p);
+            cout<<"left swap: ";
         }
         else
         {
+            cout<<"0.p: ";
+            details(p);
+            cout<<"0.ptemp: ";
+            details(ptemp);
             swapRight(ptemp, p);
+            cout<<"0.p: ";
+            details(p);
+            cout<<"0.ptemp: ";
+            details(ptemp);
+            cout<<"right swap: ";
         }
         ptemp=p->parent;
-        if(ptemp == NULL){assert((*anc)->parent != NULL); (*anc)=p; return;}
+        if(ptemp == NULL){assert((*anc)->parent != NULL); (*anc)=p;printHeap(*anc);break;}
+        printHeap(*anc);
     }
+    printHeap(*anc);
     return;
 }
 
-void insert(node **head, node **anc, int val)
+//O(logn)
+void Push(node **head, node **anc, int val)
 {
     node::size++;
     if(*head==NULL)
@@ -86,7 +124,7 @@ void insert(node **head, node **anc, int val)
         return;
     }
 }
-
+//O(logn)
 void heapifyPop(node **anc, node *p)
 {
     if(node::size==1){*anc=NULL;return;}
@@ -149,32 +187,40 @@ void heapifyPop(node **anc, node *p)
     return;
 }
 
+//O(logn)
 void Pop(node **head, node **anc)
 {
     if(*head==NULL)
     {
         assert(*anc==NULL);
         cout<<"The queue is already empty.\n";
+        node::size=0;
         return;
     }
     if((*head)->next==*head)
     {
         *head=NULL;
         *anc=NULL;
+        node::size=1;
         return;
     }
     node *p = (*head)->next;
     (*head)->next=((*head)->next)->next;
     heapifyPop(anc, p);
+    node::size--;
     return;
 }
 
-
+//O(1)
 inline void swapLeft(node *ptemp, node *p)
 {
     node* temp=ptemp->right;
     ptemp->right=p->right;
     p->right=temp;
+    cout<<"1.p: ";
+    details(p);
+    cout<<"1.ptemp: ";
+    details(ptemp);
     //p->right; ptemp->right
     ptemp->left=p->left;
     p->left=ptemp;
@@ -182,6 +228,10 @@ inline void swapLeft(node *ptemp, node *p)
     //ptemp->left; p->left
     p->parent=ptemp->parent;
     //p parent; ptemp->parent;
+    cout<<"2.p: ";
+    details(p);
+    cout<<"2.ptemp: ";
+    details(ptemp);
     if(ptemp->parent!=NULL && (ptemp->parent)->left==ptemp)
     {
         (ptemp->parent)->left=p;
@@ -192,6 +242,10 @@ inline void swapLeft(node *ptemp, node *p)
         (ptemp->parent)->right=p;
     }
     ptemp->parent=p;
+    cout<<"3.p: ";
+    details(p);
+    cout<<"3.ptemp: ";
+    details(ptemp);
     //parent of ptemp
     if(ptemp->left != NULL)(ptemp->left)->parent=ptemp;
     if(ptemp->right!= NULL)(ptemp->right)->parent=ptemp;
@@ -204,6 +258,7 @@ inline void swapLeft(node *ptemp, node *p)
     assert(p->parent != p);
 }
 
+//O(1)
 inline void swapRight(node *ptemp, node *p)
 {
     node* temp=ptemp->left;
@@ -231,6 +286,7 @@ inline void swapRight(node *ptemp, node *p)
     //children of p
 }
 
+//O(logn)
 void nodeAt(node **buf, node *anc, int s=node::size)
 {
     int h=log2(s);
@@ -253,8 +309,7 @@ void nodeAt(node **buf, node *anc, int s=node::size)
     return;
 }
 
-
-
+//O(1)
 inline int Max(node *anc)
 {
     if(anc==NULL)
@@ -265,8 +320,14 @@ inline int Max(node *anc)
     return(anc->val);
 }
 
-void printList(node *head)
+
+void printQ(node *head)
 {
+    if(head==NULL)
+    {
+        cout<<"The queue is empty.\n";
+        return;
+    }
     printf("queue:\n");
     node* ref= head;
     cout<<head->val<<" ";
@@ -281,6 +342,11 @@ void printList(node *head)
 
 void printHeap(node *top)
 {
+    if(top==NULL)
+    {
+        cout<<"The heap is empty.\n";
+        return;
+    }
     printf("heap:\n");
     if(top==NULL)return;
     queue<node *> q;
@@ -294,5 +360,22 @@ void printHeap(node *top)
         if(ele->right!= NULL)q.push(ele->right);
     }
     cout<<endl;
+    return;
+}
+
+inline void details(node *a)
+{
+    if(a==NULL)return;
+    cout<<"a: "<<a->val<<endl;
+    node* p=a->parent;
+    if(!p)cout<<"a: parent doesn't exist.\n";
+    else cout<<"parent: "<<p->val<<endl;
+    if(p != NULL && p->left)cout<<"a->parent->left: "<<(p->left)->val<<endl;
+    else if(p) cout<<"a: parent left child doesn't exist.\n";
+    if(p != NULL && p->right)cout<<"a->parent->left: "<<(p->right)->val<<endl;
+    else if(p)cout<<"a: parent right child doesn't exist.\n";
+    node *l=a->left, *r=a->right;
+    if(l!= NULL )cout<<"a->left: "<<l->val<<endl;
+    if(r!= NULL )cout<<"a->right: "<<r->val<<endl;
     return;
 }
