@@ -2,7 +2,7 @@
 
 /*
 TIME COMPLEXITY
-1. insertion: O(n)
+1. insertion: O(logn)
 2. deletion: O(logn)
 3. max: O(1)
 
@@ -30,27 +30,27 @@ void nodeAt(node **buf, node *anc, int s);
 void printHeap(node *anc);
 void printQ(node *head);
 void heapifyPush(node **anc, node *p);
-void Push(node **head, node **anc, int val);
+void Push(node **head, node** tail, node **anc, int val);
 inline int Max(node *anc);
 void heapifyPop(node **anc, node *p);
-void Pop(node **head, node **anc);
+void Pop(node **head, node **tail, node **anc);
 
 
 int main()
 {
     int arr[]={13, 123, 51, 12, 1, 13, 52};
     int s=sizeof(arr)/sizeof(arr[0]);
-    node *head=NULL, *anc=NULL;
+    node *head=NULL, *anc=NULL, *tail=NULL;
     node::size=0;
     for(int i=0; i<s; i++)
     {
-        Push(&head, &anc, arr[i]);
+        Push(&head, &tail, &anc, arr[i]);
         printQ(head);
         printHeap(anc);
     }
     for(int i=0; i<s; i++)
     {
-        Pop(&head, &anc);
+        Pop(&head, &tail, &anc);
         printQ(head);
         printHeap(anc);
     }
@@ -59,14 +59,14 @@ int main()
 
 
 
-void Push(node **head, node **anc, int val)
+void Push(node **head, node **tail, node **anc, int val)
 {
     node::size++;
     if(*head==NULL)
     {
-        assert(*anc==NULL);
+        assert(*anc==NULL && *tail==NULL);
         *head=new node(val);
-        *anc=*head;
+        *tail=*anc=*head;
         return;
     }
     else
@@ -77,20 +77,21 @@ void Push(node **head, node **anc, int val)
         if(1&(node::size)){buf->right=Node;}
         else {buf->left=Node;}
         Node->parent=buf;
-        node* temp=*head;
-        while(temp->next != NULL)temp=temp->next;
-        temp->next=Node;
+        // node* temp=*head;
+        // while(temp->next != NULL)temp=temp->next;
+        (*tail)->next=Node;
+        *tail=Node;
         heapifyPush(anc, Node);
         return;
     }
 }
 
 
-void Pop(node **head, node **anc)
+void Pop(node **head, node **tail, node **anc)
 {
     if(*head==NULL)
     {
-        assert(*anc==NULL);
+        assert(*anc==NULL && *tail==NULL);
         cout<<"The queue is already empty.\n";
         return;
     }
@@ -98,6 +99,7 @@ void Pop(node **head, node **anc)
     {
         *head=NULL;
         *anc=NULL;
+        *tail=NULL;
         return;
     }
     node *p = *head;

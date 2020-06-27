@@ -1,6 +1,14 @@
 //OM NAMO NARAYANA
 #include<bits/stdc++.h>
+#define mSize 10
 using namespace std;
+template <class T>
+void Push(T arr[], T info, int &top);
+template<class T>
+void Pop(T arr[], int &top);
+template<class T>
+T Top(T arr[], int top);
+
 int main()
 {
     //assuming each operator or operand is exactly one character
@@ -105,4 +113,27 @@ int main()
     stk.pop();
     assert(stk.empty());
     return 0;
+}
+
+template <class T>
+void Push(T arr[], T val, int &top)
+{
+    if(top == mSize-1)
+    {
+        cout<<"The stack is full.\n";
+        return;
+    }
+    top++;
+    arr[top]=val;
+    return;
+}
+
+void Pop(int &top)
+{
+    if(top==-1)
+    {
+        cout<<"The stack is already empty.\n";
+        return;
+    }
+    top=top--;
 }
