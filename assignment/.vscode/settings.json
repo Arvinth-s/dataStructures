@@ -1,6 +1,13 @@
 {
     "files.associations": {
+        "*.cpp": "cpp",
         "ostream": "cpp",
-        "iostream": "cpp"
+        "typeinfo": "cpp",
+        "iostream": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "vector": "cpp",
+        "forward_list": "cpp"
     }
 }
